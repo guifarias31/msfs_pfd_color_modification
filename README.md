@@ -13,7 +13,10 @@ Other options available: https://imgur.com/a/Io6iH8t
 
 2. Replace the file with the one you downloaded from [here](https://github.com/guifarias31/msfs_pfd_color_modification/releases).
 
-My mod comes with **Modification 1** colors, so if you want another color just change the color hex code inside AttitudeIndicator.js.
+My mod comes with **Modification 1** colors, so if you want another color just change the color hex code inside AttitudeIndicator.js:
+
+        this.horizonTopColor = "#COLORCODE";
+        this.horizonBottomColor = "#COLORCODE";
 
 ## Donation
 
