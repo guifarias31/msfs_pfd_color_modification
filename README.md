@@ -5,7 +5,7 @@ I highly recommend using with [msfs-navsystems-performance mod](https://github.c
 
 ![Mod](https://i.imgur.com/b3IInBV.png)
 
-Options available: https://imgur.com/a/Io6iH8t
+Other options available: https://imgur.com/a/Io6iH8t
 
 ## How to Install:
 
