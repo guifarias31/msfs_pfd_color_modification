@@ -1,4 +1,4 @@
-# msfs_pfd_color_modification
+# PFD Color Modification
 Color Modification for the Attitude Indication with SYN VIS OFF
 
 I highly recommend using with [msfs-navsystems-performance mod](https://github.com/Smirow/msfs-navsystems-performance).
