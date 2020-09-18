@@ -1,2 +1,2 @@
-# msfs_g1000_color_modification
- Color Modification for G1000 with SYN VIS OFF
+# msfs_pfd_color_modification
+ Color Modification for the Attitude Indication with SYN VIS OFF
