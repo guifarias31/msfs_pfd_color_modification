@@ -11,7 +11,7 @@ Other options available: https://imgur.com/a/sIJ56R0
 
 1. After installing [Working-Title G1000 mod](https://github.com/Working-Title-MSFS-Mods/fspackages), navigate to Community\workingtitle-g1000.
 
-2. Place the files you downloaded from [here](https://github.com/guifarias31/msfs_pfd_color_modification/releases).
+2. After extracting them, place the files you downloaded from [here](https://github.com/guifarias31/msfs_pfd_color_modification/releases) into the workingtitle-g1000 folder.
 
 My mod comes with **Modification 5** colors, so if you want another color just change the color hex code inside AttitudeIndicator.js:
 
