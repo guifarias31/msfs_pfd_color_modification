@@ -3,9 +3,9 @@ Color Modification for the Attitude Indication with SYN VIS OFF
 
 I highly recommend using with [msfs-navsystems-performance mod](https://github.com/Smirow/msfs-navsystems-performance).
 
-![Mod](https://i.imgur.com/b3IInBV.png)
+![Mod](https://i.imgur.com/oRs0qoB.png)
 
-Other options available: https://imgur.com/a/Io6iH8t
+Other options available: https://imgur.com/a/sIJ56R0
 
 ## How to Install:
 
