@@ -5,7 +5,7 @@ I highly recommend using with [Working-Title G1000 mod](https://github.com/Worki
 
 ![Mod](https://i.imgur.com/HY6VzYX.png)
 
-Other options available: https://imgur.com/a/7RI0yTn
+### Other options available: https://imgur.com/a/2Km6pVN
 
 ## How to Install:
 
