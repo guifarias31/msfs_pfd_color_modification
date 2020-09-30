@@ -9,10 +9,18 @@ class AttitudeIndicator extends HTMLElement {
         this.aspectRatio = 1.0;
         this.isBackup = false;
         this.horizonTopColor = "#3c6cb4";
+        this.horizonTopColorHorizon = "#4664e7";
         this.horizonBottomColor = "#65421f";
+        this.strokeWidth = 3;
+        this.syntheticVision = false;
     }
     static get observedAttributes() {
         return [
+            "actual-pitch",
+            "ground-speed",
+            "synthetic-vision",
+            "track",
+            "heading",
             "pitch",
             "bank",
             "slip_skid",
@@ -141,6 +149,13 @@ class AttitudeIndicator extends HTMLElement {
         Utils.RemoveAllChildren(this);
         {
             this.horizon = document.createElementNS(Avionics.SVG.NS, "svg");
+            let defs = document.createElementNS(Avionics.SVG.NS, "defs");
+            defs.innerHTML = `
+                <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:${this.horizonTopColor};stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:${this.horizonTopColorHorizon};stop-opacity:1" />
+                </linearGradient>`;
+            this.horizon.appendChild(defs);
             this.horizon.setAttribute("width", "100%");
             this.horizon.setAttribute("height", "100%");
             this.horizon.setAttribute("viewBox", "-200 -200 400 300");
@@ -157,7 +172,14 @@ class AttitudeIndicator extends HTMLElement {
             this.horizonTop.setAttribute("height", "2000");
             this.horizon.appendChild(this.horizonTop);
             this.bottomPart = document.createElementNS(Avionics.SVG.NS, "g");
-            this.horizon.appendChild(this.bottomPart);
+            this.horizon.appendChild(this.bottomPart);            
+            this.horizonTopGradient = document.createElementNS(Avionics.SVG.NS, "rect");
+            this.horizonTopGradient.setAttribute("fill", (this.backgroundVisible) ? "url(#sky)" : "transparent");
+            this.horizonTopGradient.setAttribute("x", "-1000");
+            this.horizonTopGradient.setAttribute("y", "-200");
+            this.horizonTopGradient.setAttribute("width", "2000");
+            this.horizonTopGradient.setAttribute("height", "200");
+            this.bottomPart.appendChild(this.horizonTopGradient);
             this.horizonBottom = document.createElementNS(Avionics.SVG.NS, "rect");
             this.horizonBottom.setAttribute("fill", (this.backgroundVisible) ? this.horizonBottomColor : "transparent");
             this.horizonBottom.setAttribute("x", "-1500");
@@ -188,11 +210,11 @@ class AttitudeIndicator extends HTMLElement {
         attitudeContainer.appendChild(this.root);
         var refHeight = (this.isBackup) ? 330 : 230;
         let attitude_pitch_container = document.createElementNS(Avionics.SVG.NS, "svg");
-        attitude_pitch_container.setAttribute("width", "230");
+        attitude_pitch_container.setAttribute("width", "300");
         attitude_pitch_container.setAttribute("height", refHeight.toString());
-        attitude_pitch_container.setAttribute("x", "-115");
+        attitude_pitch_container.setAttribute("x", "-150");
         attitude_pitch_container.setAttribute("y", "-130");
-        attitude_pitch_container.setAttribute("viewBox", "-115 -130 230 " + refHeight.toString());
+        attitude_pitch_container.setAttribute("viewBox", "-150 -130 300 " + refHeight.toString());
         attitude_pitch_container.setAttribute("overflow", "hidden");
         this.root.appendChild(attitude_pitch_container);
         this.attitude_pitch = document.createElementNS(Avionics.SVG.NS, "g");
@@ -203,11 +225,66 @@ class AttitudeIndicator extends HTMLElement {
         let triangleOuterLeft = document.createElementNS(Avionics.SVG.NS, "path");
         triangleOuterLeft.setAttribute("d", "M-140 30 l50 0 L0 0 Z");
         triangleOuterLeft.setAttribute("fill", "#d12bc7");
-        this.flightDirector.appendChild(triangleOuterLeft);
+        //this.flightDirector.appendChild(triangleOuterLeft);
         let triangleOuterRight = document.createElementNS(Avionics.SVG.NS, "path");
         triangleOuterRight.setAttribute("d", "M140 30 l-50 0 L0 0 Z");
         triangleOuterRight.setAttribute("fill", "#d12bc7");
-        this.flightDirector.appendChild(triangleOuterRight);
+        //this.flightDirector.appendChild(triangleOuterRight);
+ 
+        let triangleHeight = 16;
+        let triangleHalfHeight = triangleHeight / 2;
+        let triangleWidth = 110;
+        let triangleWidthSmall = 50;
+        let trianglePitch = 30;
+        let originOffsetX = 5;
+        let flightDirectorTriangle = 20;
+        let flightDirectorTriangleHeight = flightDirectorTriangle / 2;
+        let flightDirectorWidth = triangleWidth;
+        // Left
+        {
+            let triangle = document.createElementNS(Avionics.SVG.NS, "path");
+            triangle.setAttribute("d", `M-${flightDirectorWidth} ${trianglePitch} l-${flightDirectorTriangle} 0 l0 -${flightDirectorTriangleHeight} L-${originOffsetX} 0 Z`);
+            triangle.setAttribute("fill", "transparent");
+            triangle.setAttribute("stroke", "#000000");
+            triangle.setAttribute("stroke-width", this.strokeWidth);
+            triangle.setAttribute("stroke-linejoin", "miter");
+            this.flightDirector.appendChild(triangle);
+        }
+        {
+            let triangle = document.createElementNS(Avionics.SVG.NS, "path");
+            triangle.setAttribute("d", `M-${flightDirectorWidth} ${trianglePitch} l-${flightDirectorTriangle} -${flightDirectorTriangleHeight} L-${originOffsetX} 0 Z`);
+            triangle.setAttribute("fill", "#d12bc7");
+            this.flightDirector.appendChild(triangle);
+        }
+        {
+            let triangle = document.createElementNS(Avionics.SVG.NS, "path");
+            triangle.setAttribute("d", `M-${flightDirectorWidth} ${trianglePitch} l-${flightDirectorTriangle} 0 l0 -${flightDirectorTriangleHeight} Z`);
+            triangle.setAttribute("fill", "#990891");
+            this.flightDirector.appendChild(triangle);
+        }
+        // Right indicator
+        {
+            let triangle = document.createElementNS(Avionics.SVG.NS, "path");
+            triangle.setAttribute("d", `M${flightDirectorWidth} ${trianglePitch} l${flightDirectorTriangle} 0 l0 -${flightDirectorTriangleHeight} L${originOffsetX} 0 Z`);
+            triangle.setAttribute("fill", "transparent");
+            triangle.setAttribute("stroke", "#000000");
+            triangle.setAttribute("stroke-width", this.strokeWidth);
+            triangle.setAttribute("stroke-linejoin", "miter");
+            this.flightDirector.appendChild(triangle);
+        }
+        {
+            let triangle = document.createElementNS(Avionics.SVG.NS, "path");
+            triangle.setAttribute("d", `M${flightDirectorWidth} ${trianglePitch} l${flightDirectorTriangle} -${flightDirectorTriangleHeight} L${originOffsetX} 0 Z`);
+            triangle.setAttribute("fill", "#d12bc7");
+            this.flightDirector.appendChild(triangle);
+        }
+        {
+            let triangle = document.createElementNS(Avionics.SVG.NS, "path");
+            triangle.setAttribute("d", `M${flightDirectorWidth} ${trianglePitch} l${flightDirectorTriangle} 0 l0 -${flightDirectorTriangleHeight} Z`);
+            triangle.setAttribute("fill", "#990891");
+            this.flightDirector.appendChild(triangle);
+        }
+
         {
             this.attitude_bank = document.createElementNS(Avionics.SVG.NS, "g");
             this.root.appendChild(this.attitude_bank);
@@ -246,6 +323,11 @@ class AttitudeIndicator extends HTMLElement {
         {
             let cursors = document.createElementNS(Avionics.SVG.NS, "g");
             this.root.appendChild(cursors);
+            let leftBackground = document.createElementNS(Avionics.SVG.NS, "path");
+            leftBackground.setAttribute("d", "M-190 0 l-10 12 l50 0 l10 -12 l-10 -12 l-50 0 l10 12 Z");
+            leftBackground.setAttribute("stroke", "#000000");
+            leftBackground.setAttribute("stroke-width", this.strokeWidth);
+            cursors.appendChild(leftBackground);
             let leftLower = document.createElementNS(Avionics.SVG.NS, "path");
             leftLower.setAttribute("d", "M-190 0 l-10 12 l50 0 l10 -12 Z");
             leftLower.setAttribute("fill", "#cccc00");
@@ -254,6 +336,11 @@ class AttitudeIndicator extends HTMLElement {
             leftUpper.setAttribute("d", "M-190 0 l-10 -12 l50 0 l10 12 Z");
             leftUpper.setAttribute("fill", "#ffff00");
             cursors.appendChild(leftUpper);
+            let rightBackground = document.createElementNS(Avionics.SVG.NS, "path");
+            rightBackground.setAttribute("d", "M190 0 l10 12 l-50 0 l-10 -12 l10 -12 l50 0 l-10 12 Z");
+            rightBackground.setAttribute("stroke", "#000000");
+            rightBackground.setAttribute("stroke-width", this.strokeWidth);
+            cursors.appendChild(rightBackground);
             let rightLower = document.createElementNS(Avionics.SVG.NS, "path");
             rightLower.setAttribute("d", "M190 0 l10 12 l-50 0 l-10 -12 Z");
             rightLower.setAttribute("fill", "#cccc00");
@@ -262,14 +349,50 @@ class AttitudeIndicator extends HTMLElement {
             rightUpper.setAttribute("d", "M190 0 l10 -12 l-50 0 l-10 12 Z");
             rightUpper.setAttribute("fill", "#ffff00");
             cursors.appendChild(rightUpper);
-            let triangleInnerLeft = document.createElementNS(Avionics.SVG.NS, "path");
-            triangleInnerLeft.setAttribute("d", "M-90 30 l30 0 L0 0 Z");
-            triangleInnerLeft.setAttribute("fill", "#ffff00");
-            cursors.appendChild(triangleInnerLeft);
-            let triangleInnerRight = document.createElementNS(Avionics.SVG.NS, "path");
-            triangleInnerRight.setAttribute("d", "M90 30 l-30 0 L0 0 Z");
-            triangleInnerRight.setAttribute("fill", "#ffff00");
-            cursors.appendChild(triangleInnerRight);
+            // Left indicator
+            {
+                let triangle = document.createElementNS(Avionics.SVG.NS, "path");
+                triangle.setAttribute("d", `M-${triangleWidth} ${trianglePitch} l${triangleWidthSmall} 0 L-${originOffsetX} 0 Z`);
+                triangle.setAttribute("fill", "transparent");
+                triangle.setAttribute("stroke", "#000000");
+                triangle.setAttribute("stroke-width", this.strokeWidth);
+                triangle.setAttribute("stroke-linejoin", "miter");
+                cursors.appendChild(triangle);
+            }
+            {
+                let triangle = document.createElementNS(Avionics.SVG.NS, "path");
+                triangle.setAttribute("d", `M-${triangleWidth} ${trianglePitch} l${triangleWidthSmall} 0 L-${originOffsetX} 0 Z`);
+                triangle.setAttribute("fill", "#ffff00");
+                cursors.appendChild(triangle);
+            }
+            {
+                let triangle = document.createElementNS(Avionics.SVG.NS, "path");
+                triangle.setAttribute("d", `M-${triangleWidth - triangleWidthSmall / 2} ${trianglePitch} l${triangleWidthSmall / 2} 0 L-${originOffsetX} 0 Z`);
+                triangle.setAttribute("fill", "#a4a400");
+                cursors.appendChild(triangle);
+            }
+            // Right indicator
+            {
+                let triangle = document.createElementNS(Avionics.SVG.NS, "path");
+                triangle.setAttribute("d", `M${triangleWidth} ${trianglePitch} l-${triangleWidthSmall} 0 L${originOffsetX} 0 Z`);
+                triangle.setAttribute("fill", "transparent");
+                triangle.setAttribute("stroke", "#000000");
+                triangle.setAttribute("stroke-width", this.strokeWidth);
+                triangle.setAttribute("stroke-linejoin", "miter");
+                cursors.appendChild(triangle);
+            }
+            {
+                let triangle = document.createElementNS(Avionics.SVG.NS, "path");
+                triangle.setAttribute("d", `M${triangleWidth} ${trianglePitch} l-${triangleWidthSmall} 0 L${originOffsetX} 0 Z`);
+                triangle.setAttribute("fill", "#ffff00");
+                cursors.appendChild(triangle);
+            }
+            {
+                let triangle = document.createElementNS(Avionics.SVG.NS, "path");
+                triangle.setAttribute("d", `M${triangleWidth - triangleWidthSmall / 2} ${trianglePitch} l-${triangleWidthSmall / 2} 0 L${originOffsetX} 0 Z`);
+                triangle.setAttribute("fill", "#a4a400");
+                cursors.appendChild(triangle);
+            }
             let topTriangle = document.createElementNS(Avionics.SVG.NS, "path");
             topTriangle.setAttribute("d", "M0 -170 l-13 20 l26 0 Z");
             topTriangle.setAttribute("fill", "white");
@@ -278,6 +401,58 @@ class AttitudeIndicator extends HTMLElement {
             this.slipSkid.setAttribute("d", "M-20 -140 L-16 -146 L16 -146 L20 -140 Z");
             this.slipSkid.setAttribute("fill", "white");
             this.root.appendChild(this.slipSkid);
+        }
+        
+        {
+            let radius = 10;
+            let strokeWidth = 2;
+            let barbThickness = 3;
+            let barbLength = 10;
+            let color = "#00ff00";
+            function createBarb(rotation, outline) {
+                let barb = document.createElementNS(Avionics.SVG.NS, "rect");
+                barb.setAttribute("x",-radius - barbLength);
+                barb.setAttribute("y",-barbThickness / 2);
+                barb.setAttribute("width",barbLength);
+                barb.setAttribute("height",barbThickness);
+                if (outline) {
+                    barb.setAttribute("fill","transparent");
+                    barb.setAttribute("stroke","black");
+                    barb.setAttribute("stroke-width",strokeWidth);
+                } else {
+                    barb.setAttribute("fill",color);
+                }
+                barb.setAttribute("transform",`rotate(${rotation})`);
+                return barb;
+            }
+            let actualDirectionMarker = document.createElementNS(Avionics.SVG.NS, "g");
+            {
+                let outline = document.createElementNS(Avionics.SVG.NS, "circle");
+                outline.setAttribute("cx",0);
+                outline.setAttribute("cy",0);
+                outline.setAttribute("r",radius);
+                outline.setAttribute("fill","transparent");
+                outline.setAttribute("stroke","black");
+                outline.setAttribute("stroke-width",strokeWidth + barbThickness);
+                actualDirectionMarker.appendChild(outline);
+            }
+            actualDirectionMarker.appendChild(createBarb(0, true));
+            actualDirectionMarker.appendChild(createBarb(90, true));
+            actualDirectionMarker.appendChild(createBarb(180, true));
+            actualDirectionMarker.appendChild(createBarb(0, false));
+            actualDirectionMarker.appendChild(createBarb(90, false));
+            actualDirectionMarker.appendChild(createBarb(180, false));
+            
+            let fill = document.createElementNS(Avionics.SVG.NS, "circle");
+            fill.setAttribute("cx",0);
+            fill.setAttribute("cy",0);
+            fill.setAttribute("r",radius);
+            fill.setAttribute("fill","transparent");
+            fill.setAttribute("stroke",color);
+            fill.setAttribute("stroke-width",barbThickness);
+            actualDirectionMarker.appendChild(fill);
+            this.actualDirectionMarker = actualDirectionMarker;
+            this.attitude_pitch.appendChild(actualDirectionMarker);
         }
         this.applyAttributes();
     }
@@ -295,8 +470,20 @@ class AttitudeIndicator extends HTMLElement {
             case "pitch":
                 this.pitch = parseFloat(newValue);
                 break;
+            case "actual-pitch":
+                this.actualPitch = parseFloat(newValue);
+                break;               
+            case "ground-speed":
+                this.groundSpeed = parseFloat(newValue);
+                break;
             case "bank":
                 this.bank = parseFloat(newValue);
+                break;
+            case "track":
+                this.track = parseFloat(newValue);
+                break;
+            case "heading":
+                this.heading = parseFloat(newValue);
                 break;
             case "slip_skid":
                 this.slipSkidValue = parseFloat(newValue);
@@ -325,11 +512,38 @@ class AttitudeIndicator extends HTMLElement {
         }
         this.applyAttributes();
     }
+    getSyntheticVisionEnabled() {
+        return this.syntheticVision;
+    }
+    setSytheticVisionEnabled(enabled) {
+        this.syntheticVision = enabled;
+        if (this.syntheticVision) {
+            this.setAttribute("background", "false");
+        } else {
+            this.setAttribute("background", "true");
+        }
+    }
     applyAttributes() {
         if (this.bottomPart)
             this.bottomPart.setAttribute("transform", "rotate(" + this.bank + ", 0, 0) translate(0," + (this.pitch * this.bankSizeRatio) + ")");
-        if (this.attitude_pitch)
+        if (this.attitude_pitch) {
             this.attitude_pitch.setAttribute("transform", "rotate(" + this.bank + ", 0, 0) translate(0," + (this.pitch * this.bankSizeRatio) + ")");
+            let y = this.bankSizeRatio * this.actualPitch;
+            let a = this.track - this.heading;
+            a = (a + 180) % 360 - 180;
+            a = a * Math.PI / 180;
+            let ax = Math.sin(a);
+            let ay = Math.sin(-this.actualPitch * Math.PI / 180);
+            let az = Math.cos(a);
+            let screenWidth = 400 * 100/47.0; //From the css setting the width
+            let screenHeight = screenWidth * 3/4;
+            let fov = (80/2) * Math.PI / 180.0; 
+            let focalLength = 1 / Math.tan(fov);
+            let screenX = (ax * (focalLength / az)) * screenWidth;
+            let screenY = (ay * (focalLength / az)) * screenHeight;
+            this.actualDirectionMarker.setAttribute("transform", "translate(" + screenX.toString() + "," + screenY.toString() + ")");
+            this.actualDirectionMarker.style.visibility = (this.groundSpeed > 30 && this.syntheticVision) ? "visible" : "hidden";
+        }
         if (this.attitude_bank)
             this.attitude_bank.setAttribute("transform", "rotate(" + this.bank + ", 0, 0)");
         if (this.slipSkid)
@@ -338,10 +552,12 @@ class AttitudeIndicator extends HTMLElement {
             if (this.backgroundVisible) {
                 this.horizonTop.setAttribute("fill", this.horizonTopColor);
                 this.horizonBottom.setAttribute("fill", this.horizonBottomColor);
+                this.horizonTopGradient.setAttribute("fill", "url(#sky)");
             }
             else {
                 this.horizonTop.setAttribute("fill", "transparent");
                 this.horizonBottom.setAttribute("fill", "transparent");
+                this.horizonTopGradient.setAttribute("fill", "transparent");
             }
         }
         if (this.flightDirector) {
