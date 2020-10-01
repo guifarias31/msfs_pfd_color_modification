@@ -1,7 +1,7 @@
 # PFD Color Modification
 Color Modification for the Attitude Indication with SYN VIS OFF
 
-I highly recommend using with [Working-Title G1000 mod](https://github.com/Working-Title-MSFS-Mods/fspackages).
+To be used with [Working-Title G1000 mod](https://github.com/Working-Title-MSFS-Mods/fspackages).
 
 ![Mod](https://i.imgur.com/HY6VzYX.png)
 
