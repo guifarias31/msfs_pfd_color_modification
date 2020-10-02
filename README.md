@@ -3,9 +3,9 @@ Color Modification for the Attitude Indication with SYN VIS OFF
 
 To be used with [Working-Title G1000 mod](https://github.com/Working-Title-MSFS-Mods/fspackages).
 
-![Mod](https://i.imgur.com/HY6VzYX.png)
+![Mod](https://i.imgur.com/NTb7Edk.png)
 
-### Other colors suggested: https://imgur.com/a/2Km6pVN
+### Other colors suggested: https://imgur.com/a/3FLx3tt
 
 ## How to Install:
 
