@@ -8,9 +8,9 @@ class AttitudeIndicator extends HTMLElement {
         this.flightDirectorBank = 0;
         this.aspectRatio = 1.0;
         this.isBackup = false;
-        this.horizonTopColor = "#3c6cb4";
+        this.horizonTopColor = "#0883ed";
         this.horizonTopColorHorizon = "#4664e7";
-        this.horizonBottomColor = "#65421f";
+        this.horizonBottomColor = "#64412d";
         this.strokeWidth = 3;
         this.syntheticVision = false;
     }
