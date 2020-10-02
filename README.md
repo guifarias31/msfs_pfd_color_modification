@@ -1,7 +1,7 @@
 # PFD Color Modification
 Color Modification for the Attitude Indication with SYN VIS OFF. Comparing the G1000 Trainer colors to some [real G1000 photos](https://i.imgur.com/dMx1zCt.jpg), I was thinking that the colors may differ, so this is a simple trick on how to change the G1000 colors to whatever you want.
  
-To be used with [Working-Title G1000 mod](https://github.com/Working-Title-MSFS-Mods/fspackages).
+To be used with [Working-Title G1000 0.3.0 mod](https://github.com/Working-Title-MSFS-Mods/fspackages).
 
 ![Mod](https://i.imgur.com/NTb7Edk.png)
 
